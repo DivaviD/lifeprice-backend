@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifePrice Listings</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; background: #f9f9f9; }
+    h1 { color: #333; }
+    .listing { background: #fff; padding: 1rem; margin-bottom: 1rem; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <h1>LifePrice Listings</h1>
+  <div id="listings">Loading listings...</div>
+
+  <script>
+    async function fetchListings() {
+      try {
+        const res = await fetch('/listings');
+        const data = await res.json();
+        const container = document.getElementById('listings');
+        container.innerHTML = '';
+        if (data.length === 0) {
+          container.innerHTML = '<p>No listings available.</p>';
+          return;
+        }
+        data.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'listing';
+          div.innerHTML = '<strong>ID:</strong> ' + item.id + '<br>' +
+                          '<strong>Created At:</strong> ' + new Date(item.createdAt._seconds * 1000).toLocaleString() + '<br>' +
+                          '<pre>' + JSON.stringify(item, null, 2) + '</pre>';
+          container.appendChild(div);
+        });
+      } catch (err) {
+        document.getElementById('listings').innerText = 'Failed to load listings.';
+        console.error(err);
+      }
+    }
+
+    fetchListings();
+  </script>
+</body>
+</html>

@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
+
 // ➕ Добавление нового запроса
 app.post('/add-listing', async (req, res) => {
   try {

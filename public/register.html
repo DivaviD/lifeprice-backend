@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Регистрация</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="loader" id="loader">Загрузка...</div>
+
+<header>
+  <h1>ЖизньЦен</h1>
+  <nav>
+    <a href="/index.html">Главная</a>
+    <a href="/add.html">Разместить</a>
+    <a href="/my-requests.html">Мои запросы</a>
+    <a href="/register.html" id="loginLink">Регистрация</a>
+    <a href="/register.html" id="registerLink">Регистрация</a>
+    <a href="#" id="logoutLink" style="display:none">Выйти</a>
+  </nav>
+</header>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const user = localStorage.getItem("token");
+    if (user) {
+      document.getElementById("logoutLink").style.display = "inline";
+      document.getElementById("loginLink").style.display = "none";
+      document.getElementById("registerLink").style.display = "none";
+    }
+    document.getElementById("logoutLink").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("uid");
+      window.location.href = "/index.html";
+    });
+  });
+</script>
+
+<main>
+  <h2>Регистрация</h2>
+  <form id="registerForm">
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="password" name="password" placeholder="Пароль (мин. 6 символов)" minlength="6" required />
+    <button type="submit">Регистрация</button>
+  </form>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD2KNjBo76OVv264B1oBeLDRh7-1zAMgMk",
+    authDomain: "lifeprice-640fe.firebaseapp.com",
+    projectId: "lifeprice-640fe",
+    storageBucket: "lifeprice-640fe.firebasestorage.app",
+    messagingSenderId: "844052793112",
+    appId: "1:844052793112:web:14db3c0538c9a1e3ff406d",
+    measurementId: "G-68W7E7695Y"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
+  window.addEventListener('load', () => {
+    document.getElementById('loader').style.display = 'none';
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    try {
+      const userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+      const token = await userCred.user.getIdToken();
+      localStorage.setItem('token', token);
+      localStorage.setItem('uid', userCred.user.uid);
+      alert("Успешный вход");
+      window.location.href = "/index.html";
+    } catch (err) {
+      alert("Ошибка регистрации: " + err.message);
+    }
+  });
+</script>
+</body>
+</html>

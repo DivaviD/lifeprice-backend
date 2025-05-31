@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Разместить запрос — ЖизньЦен</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header>
+  <h1>ЖизньЦен</h1>
+  <nav>
+    <a href="/index.html">Главная</a>
+    <a href="/add.html" class="auth-only" style="display:none">Разместить запрос</a>
+    <a href="/my-requests.html" class="auth-only" style="display:none">Мои запросы</a>
+    <a href="/profile.html" class="auth-only" style="display:none">Профиль</a>
+    <a href="/login.html" class="guest-only">Войти</a>
+    <a href="/register.html" class="guest-only">Регистрация</a>
+    <a href="#" id="logoutLink" class="auth-only" style="display:none">Выйти</a>
+  </nav>
+</header>
+
+<main>
+  <h2>Разместить запрос</h2>
+  <form id="listingForm">
+    <input type="text" name="title" placeholder="Название" required />
+    <textarea name="description" placeholder="Описание" required></textarea>
+    <select name="category">
+      <option value="Товар">Товар</option>
+      <option value="Услуга">Услуга</option>
+    </select>
+    <button type="submit">Отправить</button>
+  </form>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD2KNjBo76OVv264B1oBeLDRh7-1zAMgMk",
+    authDomain: "lifeprice-640fe.firebaseapp.com",
+    projectId: "lifeprice-640fe",
+    storageBucket: "lifeprice-640fe.firebasestorage.app",
+    messagingSenderId: "844052793112",
+    appId: "1:844052793112:web:14db3c0538c9a1e3ff406d"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+    const uid = localStorage.getItem("uid");
+
+    if (!token || !uid) {
+      alert("Сначала войдите в аккаунт");
+      window.location.href = "/login.html";
+      return;
+    }
+
+    document.querySelectorAll(".auth-only").forEach(el => el.style.display = "inline");
+    document.querySelectorAll(".guest-only").forEach(el => el.style.display = "none");
+
+    document.getElementById("logoutLink").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("uid");
+      window.location.href = "/index.html";
+    });
+
+    document.getElementById("listingForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = e.target.title.value;
+      const description = e.target.description.value;
+      const category = e.target.category.value;
+
+      try {
+        const res = await fetch("/add-listing", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({ title, description, category, uid })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("Запрос добавлен!");
+          window.location.href = "/index.html";
+        } else {
+          throw new Error(data.error || "Ошибка добавления");
+        }
+      } catch (err) {
+        alert("Ошибка: " + err.message);
+      }
+    });
+  });
+</script>
+</body>
+</html>

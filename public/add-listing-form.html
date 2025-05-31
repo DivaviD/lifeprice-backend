@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добавить Запрос</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 2rem;
+    }
+    .form-container {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      max-width: 350px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #222;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Добавить Запрос</h1>
+  <div class="form-container">
+    <form id="listingForm">
+      <label for="title">Заголовок</label>
+      <input type="text" id="title" name="title" required />
+
+      <label for="description">Описание</label>
+      <textarea id="description" name="description" rows="3" required></textarea>
+
+      <button type="submit">Отправить</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('listingForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+
+      const response = await fetch('/add-listing', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title, description })
+      });
+
+      if (response.ok) {
+        alert('Запрос успешно отправлен!');
+        document.getElementById('listingForm').reset();
+      } else {
+        alert('Ошибка при отправке запроса.');
+      }
+    });
+  </script>
+</body>
+</html>

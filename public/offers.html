@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Предложения</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="loader" id="loader">Загрузка...</div>
+  <h1>Предложения к запросу</h1>
+  <input type="text" id="requestId" placeholder="ID запроса" />
+  <button onclick="loadOffers()">Показать</button>
+  <ul id="offersList"></ul>
+
+  <script>
+    window.addEventListener('load', () => {
+      document.getElementById('loader').style.display = 'none';
+    });
+
+    async function loadOffers() {
+      const id = document.getElementById('requestId').value;
+      const res = await fetch('/offers/' + id);
+      const offers = await res.json();
+      const list = document.getElementById('offersList');
+      list.innerHTML = '';
+      offers.forEach(o => {
+        const li = document.createElement('li');
+        li.textContent = 'Цена: ' + o.price;
+        list.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>

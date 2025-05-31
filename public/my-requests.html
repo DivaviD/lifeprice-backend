@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Мои запросы — ЖизньЦен</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header>
+  <h1>ЖизньЦен</h1>
+  <nav>
+    <a href="/index.html">Главная</a>
+    <a href="/add.html" class="auth-only" style="display:none">Разместить запрос</a>
+    <a href="/my-requests.html" class="auth-only" style="display:none">Мои запросы</a>
+    <a href="/profile.html" class="auth-only" style="display:none">Профиль</a>
+    <a href="/login.html" class="guest-only">Войти</a>
+    <a href="/register.html" class="guest-only">Регистрация</a>
+    <a href="#" id="logoutLink" class="auth-only" style="display:none">Выйти</a>
+  </nav>
+</header>
+
+<main>
+  <h2>Мои запросы</h2>
+  <div id="myListingsContainer"></div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD2KNjBo76OVv264B1oBeLDRh7-1zAMgMk",
+    authDomain: "lifeprice-640fe.firebaseapp.com",
+    projectId: "lifeprice-640fe",
+    storageBucket: "lifeprice-640fe.firebasestorage.app",
+    messagingSenderId: "844052793112",
+    appId: "1:844052793112:web:14db3c0538c9a1e3ff406d",
+    measurementId: "G-68W7E7695Y"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("token");
+    const uid = localStorage.getItem("uid");
+
+    if (!token || !uid) {
+      alert("Вы не авторизованы. Пожалуйста, войдите.");
+      window.location.href = "/login.html";
+      return;
+    }
+
+    document.querySelectorAll(".auth-only").forEach(el => el.style.display = "inline");
+    document.querySelectorAll(".guest-only").forEach(el => el.style.display = "none");
+
+    document.getElementById("logoutLink").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("uid");
+      window.location.href = "/index.html";
+    });
+
+    try {
+      const res = await fetch("/my-requests?uid=" + uid, {
+        headers: { Authorization: "Bearer " + token }
+      });
+      const listings = await res.json();
+      const container = document.getElementById("myListingsContainer");
+      if (listings.length === 0) {
+        container.innerHTML = "<p>У вас пока нет запросов.</p>";
+      } else {
+        container.innerHTML = listings.map(l => `
+          <div class="listing">
+            <h3>${l.title}</h3>
+            <p><strong>Категория:</strong> ${l.category}</p>
+            <p>${l.description}</p>
+          </div>
+        `).join("");
+      }
+    } catch (err) {
+      alert("Ошибка загрузки: " + err.message);
+    }
+  });
+</script>
+</body>
+</html>
